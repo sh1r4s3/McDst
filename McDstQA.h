@@ -52,6 +52,7 @@ public:
   */
   TH1F *hPx, *hPy, *hPz;
   TH1F *hX, *hY, *hZ, *hT;
+  TH2F *hdXdP;
   TH1F *hPdg;
   TH2F *hMSqrVsP;
 

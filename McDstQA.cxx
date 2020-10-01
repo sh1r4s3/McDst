@@ -58,6 +58,7 @@ McDstQA::McDstQA(const char *input_file, const char *output_file)
   hMSqrVsP = new TH2F("hMSqrVsP", ";Q*p charge*(GeV/c);m^{2} (GeV^{2}/c^{4})",
                       512, -5., 5.,
                       256, -1, 3.);
+  hdXdP = new TH2F("hdXdP", ";#DeltaX (fm);#DeltaP (GeV/c)", 512, -1., 1., 512, -1., 1.);
 
   // Create reader.
   reader = new McDstReader(input_file);
@@ -105,6 +106,8 @@ void McDstQA::run(int nev)
     int refmult05 = 0, refmult10 = 0;
     int nTracks = 0;
 
+    std::cout << "event " << iev << "/" << nev << std::endl;
+
     if (!reader->loadEntry(iev))
     {
       std::cout << "mcReader->loadEntry(iEvent) == false. Skip event.\n";
@@ -134,11 +137,12 @@ void McDstQA::run(int nev)
     double pTsum05 = 0.;
     double pTsum10 = 0.;
 
-    for (int itr = 0; itr < nTracks; ++itr)
+    for (int itr = 0; itr < nTracks - 1; ++itr)
     {
       McParticle *track = dst->particle(itr);
       int pdg = track->pdg();
       const TLorentzVector &momentum = track->momentum();
+      const TLorentzVector &position = track->position();
 
       // Calculate reference multiplicity and transverse sphericity.
       if (track->charge() != 0 && momentum.Pt() > 0.1)
@@ -167,10 +171,26 @@ void McDstQA::run(int nev)
       }
 
       // Track cut.
-      if (cut != nullptr &&
-          !cut->isGoodParticle(momentum, pdg))
+      if (abs(pdg) != 211)
       {
         continue;
+      }
+
+      for (int itr2 = itr; itr2 < nTracks; ++itr2)
+      {
+        McParticle *track2 = dst->particle(itr2);
+        int pdg2 = track2->pdg();
+        // Track cut.
+        if (abs(pdg2) != 211)
+        {
+          continue;
+        }
+
+        const TLorentzVector &momentum2 = track2->momentum();
+        const TLorentzVector &position2 = track2->position();
+        TLorentzVector dp = momentum - momentum2;
+        TLorentzVector dx = position - position2;
+        hdXdP->Fill(dx.Mag(), dp.Mag());
       }
 
       // M square vs Q*p. Px, Py, Pz.
