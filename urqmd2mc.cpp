@@ -1,4 +1,11 @@
-/**
+/*
+ * vim:et:sw=4:
+ *
+ * Copyright (c) eternity Nikita (sh1r4s3) Ermakov <sh1r4s3@mail.si-head.nl>
+ *
+ * SPDX-License-Identifier: Beerware
+ *
+ *
  * urqmd2mc reads UrQMD events from the ftn13 or ftn14 ascii files and
  * converts them to the UniGen format and saves on a root file.
  *
