@@ -42,9 +42,6 @@ McDst_Dict.C: $(shell find . -name "*.h" ! -name "*LinkDef*")
 .PHONY: clean distclean converters converters_debug converters_optdebug
 
 clean:
-	rm -vf *.o McDst_Dict*
-
-distclean:
 	rm -vf *.o McDst_Dict* $(MCDST) urqmd2mc
 
 converters_debug: CXXFLAGS += -O0 -g
