@@ -17,14 +17,12 @@
  * are discarded.
  */
 
-// C++ headers
 #include <iostream>
 #include <fstream>
 #include <iomanip>
 #include <string>
 #include <map>
 
-// ROOT headers
 #include "TObject.h"
 #include "TFile.h"
 #include "TTree.h"
@@ -33,26 +31,22 @@
 #include "TMath.h"
 #include "TClonesArray.h"
 
-// McDst headers
 #include "McRun.h"
 #include "McEvent.h"
 #include "McParticle.h"
 #include "McPIDConverter.h"
 #include "McArrays.h"
 
-using namespace std;
-
 TFile *fi;
 TTree *tr;
 TClonesArray *arrays[McArrays::NAllMcArrays];
 
-//_________________
 void bomb(const char *myst) {
     std::cerr << "Error: " << myst << ", bombing" << std::endl;
     exit(-1);
 }
 
-//_________________
+
 std::string newName(char* origName) {
     std::string fname(origName);
     std::string key1 = ".f13";
@@ -72,7 +66,6 @@ std::string newName(char* origName) {
     return fname;
 }
 
-//_________________
 int trapco(int ityp, int ichg) {
     // translate UrQMD pid code to pdg code
 
@@ -101,14 +94,12 @@ int trapco(int ityp, int ichg) {
     return McPIDConverter::instance()->pdgCode(id, McPIDConverter::eUrQMD);
 }
 
-//_________________
-int main(int argc, char *argv[]) {
-
-    ifstream in;
+int main(int argc, char **argv) {
+    std::ifstream in;
     char *inpfile;
     char c;
     int nevents;
-    string dust;
+    std::string dust;
 
     // Print debug information during the conversion
     bool debug = true;
@@ -119,7 +110,7 @@ int main(int argc, char *argv[]) {
     McRun *run = nullptr;
 
     bool isElastic;
-    string version, comment;
+    std::string version, comment;
     int filetype, eos, aproj, zproj, atarg, ztarg, nr;
     double beta, b, bmin, bmax, sigma, elab, plab, sqrts, time, dtime;
 
@@ -127,7 +118,7 @@ int main(int argc, char *argv[]) {
         std::cout << "usage:   " << argv[0] << " inputfile nevents\n";
         std::cout << "example: " << argv[0] << " inputfile.f14 10 \n"
             << "This will create inputfile.uDst.root\n";
-        exit(0);
+        return 1;
     }
 
     // Read input file from the command line
@@ -142,7 +133,7 @@ int main(int argc, char *argv[]) {
 
     // Try to open file
     in.open(inpfile);
-    if ( in.fail() ) {
+    if (in.fail()) {
         bomb("cannot open input file");
     }
 
@@ -172,8 +163,8 @@ int main(int argc, char *argv[]) {
 
     // Start event loop
     for (int n=0; n<nevents; n++) {
-        if ((n%bunch)==0) std::cout << "event "  << setw(5) << n << std::endl;
-        string line;
+        if ((n%bunch)==0) std::cout << "event "  << std::setw(5) << n << std::endl;
+        std::string line;
 
         // Read event information
         in >> dust >> dust >> version >> dust >> dust;
