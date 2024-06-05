@@ -22,6 +22,8 @@
 #include <iomanip>
 #include <string>
 #include <map>
+#include <algorithm>
+#include <optional>
 
 #include "TObject.h"
 #include "TFile.h"
@@ -94,7 +96,26 @@ int trapco(int ityp, int ichg) {
     return McPIDConverter::instance()->pdgCode(id, McPIDConverter::eUrQMD);
 }
 
-int main(int argc, char **argv) {
+bool optExists(int argc, char ** argv, const std::string & opt) {
+    return std::find(argv, argv + argc, opt) != argv + argc;
+}
+
+std::optional<std::string> getOptArg(int argc, char ** argv, const std::string & opt) {
+    auto itArg = std::find(argv, argv + argc, opt);
+    if (itArg == argv + argc || ++itArg == argv + argc) {
+        return std::nullopt;
+    }
+
+    return std::make_optional(*itArg);
+}
+
+void usage() {
+    std::cerr << "Usage: urqmd2mc -i <input file> -o <output file> [-v]" << std::endl
+              << "       optional arguments:" << std::endl
+              << "       -v  verbose mode" << std::endl;
+}
+
+int main(int argc, char ** argv) {
     std::ifstream in;
     char *inpfile;
     char c;
@@ -114,10 +135,16 @@ int main(int argc, char **argv) {
     int filetype, eos, aproj, zproj, atarg, ztarg, nr;
     double beta, b, bmin, bmax, sigma, elab, plab, sqrts, time, dtime;
 
-    if (argc != 3) {
-        std::cout << "usage:   " << argv[0] << " inputfile nevents\n";
-        std::cout << "example: " << argv[0] << " inputfile.f14 10 \n"
-            << "This will create inputfile.uDst.root\n";
+    if (argc != 4) { // for input and output
+        usage();
+        return 1;
+    }
+
+    auto inputFile = getOptArg(argc, argv, "-i");
+    auto outputFile = getOptArg(argc, argv, "-o");
+
+    if (!inputFile || !outputFile) { // we require input and output file
+        usage();
         return 1;
     }
 
