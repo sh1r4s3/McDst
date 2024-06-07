@@ -111,7 +111,7 @@ std::optional<std::string> getOptArg(int argc, char ** argv, const std::string &
 }
 
 void usage() {
-    std::cerr << "Usage: urqmd2mc -i <input file> -o <output file> -n <number of events> [-v]" << std::endl
+    std::cerr << "Usage: urqmd2mc -i <input file> -o <output file> [-v]" << std::endl
               << "       optional arguments:" << std::endl
               << "       -v  verbose mode" << std::endl;
 }
@@ -132,31 +132,16 @@ int main(int argc, char ** argv) {
     int filetype, eos, aproj, zproj, atarg, ztarg, nr;
     double beta, b, bmin, bmax, sigma, elab, plab, sqrts, time, dtime;
 
-    if (argc < 7) { // for input, output and number of events
+    if (argc < 5) { // for input, output and number of events
         usage();
         return 1;
     }
 
     auto inputFile = getOptArg(argc, argv, "-i");
     auto outputFile = getOptArg(argc, argv, "-o");
-    auto neventsArg = getOptArg(argc, argv, "-n");
 
     if (!inputFile || !outputFile || !neventsArg) { // we require input and output file
         usage();
-        return 1;
-    }
-
-    int nevents;
-    try {
-        nevents = std::stoi(*neventsArg);
-    } catch (const std::invalid_argument & e) {
-        std::cerr << "got an exception in " << e.what() << ": invalid argument" << std::endl;
-        return 1;
-    } catch (const std::out_of_range & e) {
-        std::cerr << "got an exception in " << e.what() << ": out of range" << std::endl;
-        return 1;
-    } catch (const std::exception & e) {
-        std::cerr << "got an exception in " << e.what() << std::endl;
         return 1;
     }
 
@@ -168,7 +153,7 @@ int main(int argc, char ** argv) {
                   << "number of events: " << *neventsArg << std::endl;
     }
 
-    int nout=0;
+    unsigned nout {0};
 
     // Check that filename contains .f13 or .f14
     TString oFileName(*outputFile);
