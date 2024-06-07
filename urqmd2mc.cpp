@@ -122,8 +122,6 @@ int main(int argc, char ** argv) {
     char c;
     std::string dust;
 
-    // Print debug information during the conversion
-    bool debug = true;
     // Switcher that excludes elastic collisions
     bool excludeElastic = false;
 
@@ -222,7 +220,7 @@ int main(int argc, char ** argv) {
         in >> dust >> dust >> time >> dust >> dtime;
         in.ignore(777,'\n'); // ignore the rest of the line
 
-        if ( debug ) {
+        if (verbose) {
             std::cout << "version: " << version << " sqrts: " << sqrts << " dtime: " << dtime << std::endl;
         }
         comment.clear();
@@ -260,7 +258,7 @@ int main(int argc, char ** argv) {
                 isElastic = true;
             }
 
-            if ( debug ) {
+            if ( verbose ) {
                 std::cout << "Number of particles in event: " << mult << std::endl;
             }
 
@@ -269,7 +267,7 @@ int main(int argc, char ** argv) {
 
             // Loop over generated particles
             for (int i=0;  i<mult; i++) {
-                if ( debug ) {
+                if ( verbose ) {
                     std::cout << "Working on particle i: " << i << std::endl;
                 }
                 double t, x, y, z, e, px, py, pz;
@@ -282,7 +280,7 @@ int main(int argc, char ** argv) {
                 in >> ityp >> iso3 >> ichg >> mate >> dust >> dust;
 
                 // Print particle information
-                if ( debug ) {
+                if ( verbose ) {
                     std::cout << Form( " t: %6.3f \tx: %6.3f \ty: %6.3f \tz: %6.3f \tpx: %6.3f \tpy: %6.3f \tpz: %6.3f\n",
                                       t, x, y, z, px, py, pz );
                 }
@@ -293,7 +291,7 @@ int main(int argc, char ** argv) {
                     in >> e >> px >> py >> pz;
 
                     // Print freeze-out information
-                    if ( debug ) {
+                    if ( verbose ) {
                         std::cout << Form( " t: %6.3f \tx: %6.3f \ty: %6.3f \tz: %6.3f \tpx: %6.3f \tpy: %6.3f \tpz: %6.3f\n",
                                           t, x, y, z, px, py, pz );
                     }
@@ -312,7 +310,7 @@ int main(int argc, char ** argv) {
                                px, py, pz, e, x, y, z, t );
                 std::cout << "LEL\n";
                 // Print particle information stored in McParticle
-                if (debug) {
+                if (verbose) {
                     int iPart = arrays[McArrays::Particle]->GetEntries();
                     McParticle *particle = (McParticle*)arrays[McArrays::Particle]->At(iPart-1);
                     if ( !particle ) {
