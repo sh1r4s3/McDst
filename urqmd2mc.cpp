@@ -118,7 +118,6 @@ void usage() {
 
 int main(int argc, char ** argv) {
     std::ifstream in;
-    char *inpfile;
     char c;
     std::string dust;
 
@@ -172,10 +171,10 @@ int main(int argc, char ** argv) {
     int nout=0;
 
     // Check that filename contains .f13 or .f14
-    TString oFileName( newName( argv[1] ) );
+    TString oFileName(*outputFile);
 
     // Try to open file
-    in.open(inpfile);
+    in.open(*inputFile);
     if (in.fail()) {
         bomb("cannot open input file");
     }
@@ -199,14 +198,11 @@ int main(int argc, char ** argv) {
         tr->Branch(McArrays::mcArrayNames[i], &arrays[i], bufsize / 4, split);
     }
 
-    // How oftep to print info
-    const int bunch = 100;
-
-    int events_processed=0;
+    int events_processed {0};
+    unsigned ntime_slices {0};
 
     // Start event loop
-    for (int n=0; n<nevents; n++) {
-        if ((n%bunch)==0) std::cout << "event "  << std::setw(5) << n << std::endl;
+    while (!in.eof()) {
         std::string line;
 
         // Read event information
@@ -221,8 +217,12 @@ int main(int argc, char ** argv) {
         in.ignore(777,'\n'); // ignore the rest of the line
 
         if (verbose) {
-            std::cout << "version: " << version << " sqrts: " << sqrts << " dtime: " << dtime << std::endl;
+            std::cout << "event#: " << events_processed
+                      << "version: " << version
+                      << "sqrts: " << sqrts
+                      << "dtime: " << dtime << std::endl;
         }
+
         comment.clear();
         // read 4 lines of options and 6 lines of params
         for (int i=0; i<10; i++) {
@@ -304,14 +304,14 @@ int main(int argc, char ** argv) {
 
                 status = parent_decay = decay = child[0] = child[1] = 0;
                 // Add new particle to the event
-                new ( ( *(arrays[McArrays::Particle]) )[arrays[McArrays::Particle]->GetEntries()])
-                    McParticle( i, trapco(ityp, ichg), status, parent,
-                               parent_decay, mate-1, decay, child,
-                               px, py, pz, e, x, y, z, t );
-                std::cout << "LEL\n";
+                McParticle * k = new McParticle(i, trapco(ityp, ichg), status, parent,
+                                                       parent_decay, mate-1, decay, child,
+                                                       px, py, pz, e, x, y, z, t );
+                arrays[McArrays::Particle]->operator[](i) = k;
                 // Print particle information stored in McParticle
                 if (verbose) {
                     int iPart = arrays[McArrays::Particle]->GetEntries();
+                    std::cout << "PART=" << iPart << std::endl;
                     McParticle *particle = (McParticle*)arrays[McArrays::Particle]->At(iPart-1);
                     if ( !particle ) {
                         std::cout << "Particle does not exist!" << std::endl;
@@ -332,9 +332,7 @@ int main(int argc, char ** argv) {
             // to be skipped
             if ( !(isElastic && excludeElastic) ) {
                 // Add new McEvent
-                McEvent *ev = new ( ( *(arrays[McArrays::Event]) )[arrays[McArrays::Event]->GetEntries()]) McEvent();
-                std::cout << "KEK\n";
-
+                McEvent * ev = new McEvent();
                 ev->setEventNr(nr);
                 ev->setB(b);
                 ev->setPhi(0);
@@ -342,6 +340,8 @@ int main(int argc, char ** argv) {
                 ev->setComment(line.data());
                 ev->setStepNr(step_nr++);
                 ev->setStepT(step_time);
+
+                arrays[McArrays::Particle]->operator[](ntime_slices++) = ev;
 
                 // Fill DST with event and track information
                 nout += tr->Fill();
