@@ -140,7 +140,7 @@ int main(int argc, char ** argv) {
     auto inputFile = getOptArg(argc, argv, "-i");
     auto outputFile = getOptArg(argc, argv, "-o");
 
-    if (!inputFile || !outputFile || !neventsArg) { // we require input and output file
+    if (!inputFile || !outputFile) { // we require input and output file
         usage();
         return 1;
     }
@@ -149,8 +149,7 @@ int main(int argc, char ** argv) {
 
     if (verbose) {
         std::cout << "input file: " << *inputFile << std::endl
-                  << "output file: " << *outputFile << std::endl
-                  << "number of events: " << *neventsArg << std::endl;
+                  << "output file: " << *outputFile << std::endl;
     }
 
     unsigned nout {0};
