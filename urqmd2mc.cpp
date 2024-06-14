@@ -228,7 +228,7 @@ int main(int argc, char ** argv) {
         int step_nr=0;
         char pee;
         // Loop over time slices
-        while (1) {
+        while (!in.eof()) {
             int mult;
             double step_time;
             pee=in.peek();
@@ -292,6 +292,7 @@ int main(int argc, char ** argv) {
                                                        parent_decay, mate-1, decay, child,
                                                        px, py, pz, e, x, y, z, t );
                 arrays[McArrays::Particle]->operator[](i) = k;
+
                 // Print particle information stored in McParticle
                 if (verbose) {
                     int iPart = arrays[McArrays::Particle]->GetEntries();
@@ -325,8 +326,10 @@ int main(int argc, char ** argv) {
                 ev->setStepNr(step_nr++);
                 ev->setStepT(step_time);
 
-                arrays[McArrays::Particle]->operator[](ntime_slices++) = ev;
-
+                std::cout << "event#: " << events_processed << "    tslice: " << ntime_slices << std::endl;
+                int iEvent = arrays[McArrays::Event]->GetEntries();
+                arrays[McArrays::Particle]->operator[](iEvent) = ev;
+                ntime_slices++;
                 // Fill DST with event and track information
                 nout += tr->Fill();
             }
