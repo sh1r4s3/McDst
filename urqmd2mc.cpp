@@ -340,6 +340,8 @@ int main(int argc, char ** argv) {
     in.close();
     std::cout << events_processed << " events processed\n";
 
+    tr->Write();
+
     // create the run object
     std::string generator = "UrQMD";
     generator.append(version);

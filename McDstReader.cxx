@@ -171,6 +171,8 @@ void McDstReader::Init() {
     mChain->AddBranchToCache("*");
     mMcDst->set(mMcArrays);
     mMcRun = (McRun*)mChain->GetFile()->Get("run");
+  } else {
+      std::cout << "Chain doesn't exist" << std::endl;
   }
 }
 
