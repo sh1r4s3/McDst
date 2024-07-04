@@ -56,9 +56,9 @@ McDstQA::McDstQA(const char *input_file, const char *output_file) {
   assert(reader != nullptr);
   reader->Init();
 
-  reader->setStatus("*",0);
-  reader->setStatus("Event",1);
-  reader->setStatus("Particle",1);
+  reader->setStatus("*",1);
+//  reader->setStatus("Event",1);
+//  reader->setStatus("Particle",1);
 
   // Check TChain and get number of entries.
   assert(reader->chain() != nullptr);
@@ -103,6 +103,7 @@ void McDstQA::run(int nev) {
       std::cout << "McDst == nullptr. Skip event.\n";
       continue;
     }
+    std::cout << "McDst: number of particles: " << dst->numberOfParticles() << std::endl;
     McEvent *event = dst->event();
     if (event == nullptr) {
       std::cout << "McEvent == nullptr. Skip event.\n";

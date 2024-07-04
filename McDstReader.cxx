@@ -189,6 +189,7 @@ Bool_t McDstReader::loadEntry(Long64_t iEntry __attribute__((unused))) {
 
   Int_t bytes = mChain->GetEntry(mEventCounter++);
   Int_t nCycles = 0;
+  std::cout << "bytes read: " << bytes << std::endl;
   while( bytes <= 0) {
     if( mEventCounter >= mChain->GetEntriesFast() ) {
     }
